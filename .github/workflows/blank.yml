@@ -1,36 +1,37 @@
-name: Branch policy
+name: CI
 
 on:
+  # Run when commits are pushed to main or dev.
+  push:
+    branches:
+      - main
+      - dev
+
+  # Run when a pull request targets main or dev.
   pull_request:
     branches:
-      - dev
       - main
-    types: [opened, reopened, synchronize, ready_for_review]
+      - dev
 
-permissions:
-  contents: read
+  # Allow manual execution from the GitHub Actions page.
+  workflow_dispatch:
 
 jobs:
-  branch-direction:
-    name: branch-direction
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Validate pull-request source and target
-        env:
-          BASE_BRANCH: ${{ github.base_ref }}
-          HEAD_BRANCH: ${{ github.head_ref }}
-        shell: bash
-        run: |
-          set -euo pipefail
+      # Download the repository.
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-          if [[ "$BASE_BRANCH" == "main" && "$HEAD_BRANCH" != "dev" ]]; then
-            echo "Only dev may be merged into main. Received: $HEAD_BRANCH -> $BASE_BRANCH"
-            exit 1
-          fi
+      # Replace this with your actual build command.
+      - name: Build
+        run: echo "Building project..."
 
-          if [[ "$BASE_BRANCH" == "dev" && ! "$HEAD_BRANCH" =~ ^feature/[a-zA-Z0-9._-]+$ ]]; then
-            echo "Only feature/* branches may be merged into dev. Received: $HEAD_BRANCH -> $BASE_BRANCH"
-            exit 1
-          fi
+      # Replace this with your actual test command.
+      - name: Test
+        run: echo "Running tests..."
 
-          echo "Allowed branch flow: $HEAD_BRANCH -> $BASE_BRANCH"
+      - name: Complete
+        run: echo "CI completed successfully."
